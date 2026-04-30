@@ -1,0 +1,216 @@
+    <div class="course-form-page">
+      <div class="container">
+        <div class="page-header">
+          <a routerLink="/instructor/courses" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to Courses
+          </a>
+          <h1>{{ isEditMode ? 'Edit Course' : 'Create New Course' }}</h1>
+        </div>
+
+        @if (error) {
+          <div class="alert alert-danger">{{ error }}</div>
+        }
+
+        <form (ngSubmit)="onSubmit()">
+          <div class="form-section">
+            <h2>Basic Information</h2>
+            
+            <div class="form-group">
+              <label for="title">Course Title *</label>
+              <input 
+                type="text" 
+                id="title" 
+                [(ngModel)]="course.title" 
+                name="title" 
+                placeholder="e.g., Complete Web Development Bootcamp"
+                required
+              >
+            </div>
+
+            <div class="form-group">
+              <label for="shortDescription">Short Description *</label>
+              <input 
+                type="text" 
+                id="shortDescription" 
+                [(ngModel)]="course.shortDescription" 
+                name="shortDescription" 
+                placeholder="A brief summary of your course"
+                required
+              >
+            </div>
+
+            <div class="form-group">
+              <label for="description">Full Description *</label>
+              <textarea 
+                id="description" 
+                [(ngModel)]="course.description" 
+                name="description" 
+                rows="5"
+                placeholder="Detailed description of your course"
+                required
+              ></textarea>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="category">Category *</label>
+                <select id="category" [(ngModel)]="course.categoryId" name="category" required>
+                  <option value="">Select a category</option>
+                  <option value="1">Programming</option>
+                  <option value="2">Design</option>
+                  <option value="3">Business</option>
+                  <option value="4">Marketing</option>
+                  <option value="5">Data Science</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="level">Level *</label>
+                <select id="level" [(ngModel)]="course.level" name="level" required>
+                  <option value="">Select level</option>
+                  <option value="BEGINNER">Beginner</option>
+                  <option value="INTERMEDIATE">Intermediate</option>
+                  <option value="ADVANCED">Advanced</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="price">Price (USD) *</label>
+                <input 
+                  type="number" 
+                  id="price" 
+                  [(ngModel)]="course.price" 
+                  name="price" 
+                  min="0"
+                  step="0.01"
+                  required
+                >
+              </div>
+
+              <div class="form-group">
+                <label for="discountPrice">Discount Price</label>
+                <input 
+                  type="number" 
+                  id="discountPrice" 
+                  [(ngModel)]="course.discountPrice" 
+                  name="discountPrice" 
+                  min="0"
+                  step="0.01"
+                >
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="thumbnail">Thumbnail URL</label>
+              <input 
+                type="url" 
+                id="thumbnail" 
+                [(ngModel)]="course.thumbnail" 
+                name="thumbnail" 
+                placeholder="https://example.com/image.jpg"
+              >
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h2>What You'll Learn</h2>
+            <p class="section-description">Add learning points that students will gain from this course</p>
+            
+            <div class="learning-points">
+              @for (point of course.learningPoints; track point; let i = $index) {
+                <div class="learning-point">
+                  <input 
+                    type="text" 
+                    [(ngModel)]="course.learningPoints[i]" 
+                    [name]="'learningPoint' + i"
+                    placeholder="e.g., Build responsive websites"
+                  >
+                  <button type="button" class="btn-icon" (click)="removeLearningPoint(i)">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              }
+              <button type="button" class="btn btn-outline" (click)="addLearningPoint()">
+                <i class="fas fa-plus"></i> Add Learning Point
+              </button>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h2>Course Content</h2>
+            <p class="section-description">Add lessons to your course</p>
+            
+            <div class="lessons-list">
+              @for (lesson of course.lessons; track lesson; let i = $index) {
+                <div class="lesson-card">
+                  <div class="lesson-header">
+                    <span class="lesson-number">Lesson {{ i + 1 }}</span>
+                    <button type="button" class="btn-icon btn-danger" (click)="removeLesson(i)">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                  <div class="lesson-body">
+                    <div class="form-group">
+                      <label>Title</label>
+                      <input 
+                        type="text" 
+                        [(ngModel)]="course.lessons[i].title" 
+                        [name]="'lessonTitle' + i"
+                        placeholder="Lesson title"
+                      >
+                    </div>
+                    <div class="form-group">
+                      <label>Content</label>
+                      <textarea 
+                        [(ngModel)]="course.lessons[i].content" 
+                        [name]="'lessonContent' + i"
+                        rows="3"
+                        placeholder="Lesson content"
+                      ></textarea>
+                    </div>
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label>Duration (minutes)</label>
+                        <input 
+                          type="number" 
+                          [(ngModel)]="course.lessons[i].duration" 
+                          [name]="'lessonDuration' + i"
+                          min="1"
+                        >
+                      </div>
+                      <div class="form-group">
+                        <label>Video URL</label>
+                        <input 
+                          type="url" 
+                          [(ngModel)]="course.lessons[i].videoUrl" 
+                          [name]="'lessonVideo' + i"
+                          placeholder="https://example.com/video.mp4"
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              }
+              <button type="button" class="btn btn-outline" (click)="addLesson()">
+                <i class="fas fa-plus"></i> Add Lesson
+              </button>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-outline" routerLink="/instructor/courses">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="saving">
+              @if (saving) {
+                <span class="spinner-small"></span>
+              } @else {
+                {{ isEditMode ? 'Update Course' : 'Create Course' }}
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>

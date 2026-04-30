@@ -1,0 +1,11 @@
+# Ignore frontend secrets
+lms-frontend/.env
+lms-frontend/node_modules/
+lms-frontend/src/environments/environment.prod.ts
+lms-frontend/src/environments/environment.ts
+
+# Ignore backend secrets
+lms-backend/.env
+lms-backend/target/
+lms-backend/src/resources/application.yml
+lms-backend/*.jar

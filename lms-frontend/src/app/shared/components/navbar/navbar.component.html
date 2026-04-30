@@ -1,0 +1,45 @@
+    <nav class="navbar">
+      <div class="container navbar-container">
+        <a routerLink="/" class="navbar-brand">
+          <i class="fas fa-graduation-cap"></i> LMS
+        </a>
+        
+        <div class="navbar-nav">
+          <a routerLink="/courses" routerLinkActive="active">Courses</a>
+          
+          @if (authServiceGetter.isLoggedIn()) {
+            @if (authServiceGetter.isInstructor()) {
+              <a routerLink="/instructor/courses" routerLinkActive="active">My Courses</a>
+            }
+            <a routerLink="/my-courses" routerLinkActive="active">My Learning</a>
+            <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+            
+            <div class="user-menu">
+              <button class="user-btn" (click)="toggleMenu()">
+                <div class="avatar">
+                  {{ getUserInitials() }}
+                </div>
+              </button>
+              
+              @if (showMenu) {
+                <div class="dropdown-menu">
+                  <a routerLink="/dashboard" (click)="showMenu = false">
+                    <i class="fas fa-user"></i> Profile
+                  </a>
+                  <a routerLink="/my-courses" (click)="showMenu = false">
+                    <i class="fas fa-book"></i> My Courses
+                  </a>
+                  <hr>
+                  <a (click)="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                  </a>
+                </div>
+              }
+            </div>
+          } @else {
+            <a routerLink="/login" class="btn btn-outline btn-sm">Login</a>
+            <a routerLink="/register" class="btn btn-primary btn-sm">Register</a>
+          }
+        </div>
+      </div>
+    </nav>
