@@ -55,6 +55,12 @@ public class Course {
 
     private String outcomes;
 
+    @ElementCollection
+    @CollectionTable(name = "course_learning_points", joinColumns = @JoinColumn(name = "course_id"))
+    @Column(name = "learning_point", length = 500)
+    @Builder.Default
+    private List<String> learningPoints = new ArrayList<>();
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "instructor_id", nullable = false)
     private User instructor;

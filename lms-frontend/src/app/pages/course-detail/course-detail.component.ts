@@ -1,7 +1,8 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { CourseService, Course, Lesson } from '../../core/services/course.service';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { CourseService, Course } from '../../core/services/course.service';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
@@ -65,6 +66,15 @@ import { AuthService } from '../../core/services/auth.service';
 
                 <section class="section">
                   <h2>Course Content</h2>
+                  @if (!isLoggedIn) {
+                    <div class="unlock-banner">
+                      <p>Login to preview course lessons and enroll to unlock full video content.</p>
+                    </div>
+                  } @else if (isStudent && !isEnrolled) {
+                    <div class="unlock-banner enroll-warning">
+                      <p>Enroll now to unlock all lesson videos and full course content.</p>
+                    </div>
+                  }
                   <div class="curriculum">
                     @for (lesson of course.lessons; track lesson.id; let i = $index) {
                       <div class="lesson-item" [class.expanded]="expandedLessons.has(lesson.id)" (click)="toggleLesson(lesson.id)">
@@ -77,9 +87,29 @@ import { AuthService } from '../../core/services/auth.service';
                         @if (expandedLessons.has(lesson.id)) {
                           <div class="lesson-content">
                             <p>{{ lesson.content }}</p>
-                            @if (lesson.videoUrl) {
+                            @if (lesson.videoUrl && canViewLessonVideos()) {
                               <div class="video-container">
-                                <video [src]="lesson.videoUrl" controls></video>
+                                @if (isYouTubeUrl(lesson.videoUrl)) {
+                                  <div class="video-embed">
+                                    <iframe [src]="getEmbedUrl(lesson.videoUrl)"
+                                            frameborder="0"
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                            allowfullscreen>
+                                    </iframe>
+                                  </div>
+                                } @else {
+                                  <video [src]="lesson.videoUrl" controls></video>
+                                }
+                              </div>
+                            } @else if (!lesson.videoUrl) {
+                              <div class="lesson-locked">
+                                <p>
+                                  @if (!isLoggedIn) {
+                                    Login to unlock the full lesson video.
+                                  } @else {
+                                    Enroll in this course to unlock the full lesson video.
+                                  }
+                                </p>
                               </div>
                             }
                           </div>
@@ -129,6 +159,24 @@ import { AuthService } from '../../core/services/auth.service';
                       <button class="btn btn-primary btn-block" (click)="startLearning()">
                         <i class="fas fa-play"></i> Continue Learning
                       </button>
+                    } @else if (isStudent) {
+                      <button class="btn btn-primary btn-block" (click)="enroll()">
+                        <i class="fas fa-shopping-cart"></i> Enroll Now
+                      </button>
+                    } @else if (isInstructor) {
+                      <button class="btn btn-secondary btn-block" (click)="goToInstructorDashboard()">
+                        <i class="fas fa-chalkboard-teacher"></i> Open Instructor Dashboard
+                      </button>
+                      <p class="helper-text">
+                        Instructor accounts manage course content from the dashboard instead of enrolling.
+                      </p>
+                    } @else if (isAdmin) {
+                      <button class="btn btn-secondary btn-block" (click)="goToAdminPanel()">
+                        <i class="fas fa-user-shield"></i> Open Admin Panel
+                      </button>
+                      <p class="helper-text">
+                        Admins can manage users, instructors, and payments from the admin panel.
+                      </p>
                     } @else {
                       <button class="btn btn-primary btn-block" (click)="enroll()">
                         <i class="fas fa-shopping-cart"></i> Enroll Now
@@ -270,6 +318,21 @@ import { AuthService } from '../../core/services/auth.service';
       overflow: hidden;
     }
 
+    .unlock-banner,
+    .lesson-locked {
+      background: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      color: #475569;
+    }
+
+    .lesson-locked p {
+      margin: 0;
+      font-style: italic;
+    }
+
     .lesson-item {
       border-bottom: 1px solid #e5e7eb;
       cursor: pointer;
@@ -318,9 +381,16 @@ import { AuthService } from '../../core/services/auth.service';
       margin-top: 16px;
     }
 
-    .video-container video {
+    .video-container video,
+    .video-embed iframe {
       width: 100%;
       border-radius: 8px;
+    }
+
+    .video-embed iframe {
+      min-height: 360px;
+      aspect-ratio: 16 / 9;
+      border: none;
     }
 
     .instructor-card {
@@ -404,6 +474,13 @@ import { AuthService } from '../../core/services/auth.service';
       margin-bottom: 24px;
     }
 
+    .helper-text {
+      margin-top: 12px;
+      color: #6b7280;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
     .course-features {
       list-style: none;
       padding: 0;
@@ -456,17 +533,26 @@ import { AuthService } from '../../core/services/auth.service';
 export class CourseDetailComponent implements OnInit {
   course: Course | null = null;
   loading = true;
+  isLoggedIn = false;
   isEnrolled = false;
+  isInstructor = false;
+  isAdmin = false;
+  isStudent = false;
   expandedLessons = new Set<number>();
 
   constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private courseService: CourseService,
-    private authService: AuthService
+    private readonly route: ActivatedRoute,
+    private readonly router: Router,
+    private readonly courseService: CourseService,
+    private readonly authService: AuthService,
+    private readonly sanitizer: DomSanitizer
   ) {}
 
   ngOnInit(): void {
+    this.isLoggedIn = this.authService.isLoggedIn();
+    this.isInstructor = this.authService.isInstructor();
+    this.isAdmin = this.authService.isAdmin();
+    this.isStudent = this.authService.isStudent();
     const courseId = this.route.snapshot.paramMap.get('id');
     if (courseId) {
       this.loadCourse(+courseId);
@@ -488,7 +574,7 @@ export class CourseDetailComponent implements OnInit {
   }
 
   checkEnrollment(courseId: number): void {
-    if (this.authService.isLoggedIn()) {
+    if (this.authService.isStudent()) {
       this.courseService.checkEnrollment(courseId).subscribe({
         next: (enrolled) => {
           this.isEnrolled = enrolled;
@@ -505,6 +591,30 @@ export class CourseDetailComponent implements OnInit {
     }
   }
 
+  isYouTubeUrl(url: string): boolean {
+    return /(?:youtu\.be\/|youtube\.com\/)/i.test(url);
+  }
+
+  canViewLessonVideos(): boolean {
+    return this.isEnrolled || this.isInstructor || this.isAdmin;
+  }
+
+  getEmbedUrl(url: string): SafeResourceUrl | string {
+    if (!this.isYouTubeUrl(url)) {
+      return url;
+    }
+
+    const videoId = this.getYouTubeVideoId(url);
+    const embedUrl = `https://www.youtube.com/embed/${videoId}`;
+    return this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
+  }
+
+  getYouTubeVideoId(url: string): string {
+    const regex = /(?:youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/;
+    const result = regex.exec(url);
+    return result ? result[1] : url;
+  }
+
   enroll(): void {
     if (!this.authService.isLoggedIn()) {
       this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
@@ -515,6 +625,14 @@ export class CourseDetailComponent implements OnInit {
       // Navigate to checkout
       this.router.navigate(['/checkout', this.course.id]);
     }
+  }
+
+  goToInstructorDashboard(): void {
+    this.router.navigate(['/instructor/courses']);
+  }
+
+  goToAdminPanel(): void {
+    this.router.navigate(['/admin']);
   }
 
   startLearning(): void {

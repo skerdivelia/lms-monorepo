@@ -15,6 +15,8 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     
     Page<Course> findByPublishedTrue(Pageable pageable);
     
+    Page<Course> findByInstructorId(Long instructorId, Pageable pageable);
+
     Page<Course> findByInstructorIdAndPublished(Long instructorId, boolean published, Pageable pageable);
     
     Page<Course> findByCategoryId(Long categoryId, Pageable pageable);

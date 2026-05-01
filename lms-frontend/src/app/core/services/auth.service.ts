@@ -40,11 +40,11 @@ export interface RegisterRequest {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = environment.apiUrl;
-  private currentUserSubject = new BehaviorSubject<User | null>(null);
+  private readonly apiUrl = environment.apiUrl;
+  private readonly currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor(private http: HttpClient) {
+  constructor(private readonly http: HttpClient) {
     this.loadUserFromStorage();
   }
 
@@ -98,9 +98,14 @@ export class AuthService {
     return !!this.getToken();
   }
 
+  isStudent(): boolean {
+    const user = this.getCurrentUser();
+    return user?.role === 'STUDENT';
+  }
+
   isInstructor(): boolean {
     const user = this.getCurrentUser();
-    return user?.role === 'INSTRUCTOR' || user?.role === 'ADMIN';
+    return user?.role === 'INSTRUCTOR';
   }
 
   isAdmin(): boolean {

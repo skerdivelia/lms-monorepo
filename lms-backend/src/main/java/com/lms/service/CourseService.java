@@ -12,8 +12,10 @@ public interface CourseService {
     CourseResponse updateCourse(Long courseId, CourseRequest request, Long userId);
     void deleteCourse(Long courseId, Long userId);
     CourseResponse getCourseById(Long courseId);
+    CourseResponse getCourseById(Long courseId, Long userId);
     Page<CourseResponse> getAllCourses(Pageable pageable);
     Page<CourseResponse> getCoursesByInstructor(Long instructorId, Pageable pageable);
+    List<CourseResponse> getCoursesByInstructor(Long instructorId);
     Page<CourseResponse> getCoursesByCategory(Long categoryId, Pageable pageable);
     Page<CourseResponse> searchCourses(String keyword, Pageable pageable);
     List<CourseResponse> getTopCourses(int limit);

@@ -9,6 +9,7 @@ import com.lms.exception.CourseException;
 import com.lms.exception.UnauthorizedException;
 import com.lms.repository.CategoryRepository;
 import com.lms.repository.CourseRepository;
+import com.lms.repository.EnrollmentRepository;
 import com.lms.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,14 +18,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class CourseServiceImpl implements CourseService {
 
+    private static final String COURSE_NOT_FOUND = "Course not found with id: ";
+
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
+    private final EnrollmentRepository enrollmentRepository;
     private final CategoryRepository categoryRepository;
 
     @Override
@@ -69,7 +72,7 @@ public class CourseServiceImpl implements CourseService {
     @Transactional
     public CourseResponse updateCourse(Long courseId, CourseRequest request, Long userId) {
         Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new CourseException("Course not found with id: " + courseId));
+                .orElseThrow(() -> new CourseException(COURSE_NOT_FOUND + courseId));
 
         if (!course.getInstructor().getId().equals(userId)) {
             throw new UnauthorizedException("You can only update your own courses");
@@ -100,7 +103,7 @@ public class CourseServiceImpl implements CourseService {
     @Transactional
     public void deleteCourse(Long courseId, Long userId) {
         Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new CourseException("Course not found with id: " + courseId));
+                .orElseThrow(() -> new CourseException(COURSE_NOT_FOUND + courseId));
 
         if (!course.getInstructor().getId().equals(userId)) {
             throw new UnauthorizedException("You can only delete your own courses");
@@ -111,9 +114,14 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public CourseResponse getCourseById(Long courseId) {
+        return getCourseById(courseId, null);
+    }
+
+    @Override
+    public CourseResponse getCourseById(Long courseId, Long userId) {
         Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new CourseException("Course not found with id: " + courseId));
-        return mapToResponse(course);
+                .orElseThrow(() -> new CourseException(COURSE_NOT_FOUND + courseId));
+        return mapToResponse(course, userId);
     }
 
     @Override
@@ -126,6 +134,14 @@ public class CourseServiceImpl implements CourseService {
     public Page<CourseResponse> getCoursesByInstructor(Long instructorId, Pageable pageable) {
         return courseRepository.findByInstructorIdAndPublished(instructorId, true, pageable)
                 .map(this::mapToResponse);
+    }
+
+    @Override
+    public List<CourseResponse> getCoursesByInstructor(Long instructorId) {
+        return courseRepository.findByInstructorId(instructorId, Pageable.unpaged())
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
     @Override
@@ -145,7 +161,7 @@ public class CourseServiceImpl implements CourseService {
         return courseRepository.findTopCourses(Pageable.ofSize(limit))
                 .stream()
                 .map(this::mapToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -153,14 +169,14 @@ public class CourseServiceImpl implements CourseService {
         return courseRepository.findLatestCourses(Pageable.ofSize(limit))
                 .stream()
                 .map(this::mapToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
     @Transactional
     public CourseResponse publishCourse(Long courseId, Long userId) {
         Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new CourseException("Course not found with id: " + courseId));
+                .orElseThrow(() -> new CourseException(COURSE_NOT_FOUND + courseId));
 
         if (!course.getInstructor().getId().equals(userId)) {
             throw new UnauthorizedException("You can only publish your own courses");
@@ -182,7 +198,7 @@ public class CourseServiceImpl implements CourseService {
         }
 
         Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new CourseException("Course not found with id: " + courseId));
+                .orElseThrow(() -> new CourseException(COURSE_NOT_FOUND + courseId));
 
         course.setApproved(true);
         Course savedCourse = courseRepository.save(course);
@@ -190,6 +206,11 @@ public class CourseServiceImpl implements CourseService {
     }
 
     private CourseResponse mapToResponse(Course course) {
+        return mapToResponse(course, null);
+    }
+
+    private CourseResponse mapToResponse(Course course, Long userId) {
+        boolean hasAccess = userId != null && hasVideoAccess(course.getId(), userId);
         return CourseResponse.builder()
                 .id(course.getId())
                 .title(course.getTitle())
@@ -204,21 +225,61 @@ public class CourseServiceImpl implements CourseService {
                 .approved(course.isApproved())
                 .requirements(course.getRequirements())
                 .outcomes(course.getOutcomes())
+                .learningPoints(course.getLearningPoints())
                 .instructor(CourseResponse.UserSummary.builder()
                         .id(course.getInstructor().getId())
                         .firstName(course.getInstructor().getFirstName())
                         .lastName(course.getInstructor().getLastName())
                         .avatar(course.getInstructor().getAvatar())
+                        .title(course.getInstructor().getRole() != null ? course.getInstructor().getRole().name() : "Instructor")
+                        .bio(course.getInstructor().getBio())
                         .build())
                 .category(course.getCategory() != null ? CourseResponse.CategoryResponse.builder()
                         .id(course.getCategory().getId())
                         .name(course.getCategory().getName())
                         .icon(course.getCategory().getIcon())
                         .build() : null)
+                .lessons(course.getLessons().stream().map(lesson -> {
+                    boolean lessonAccessible = hasAccess || lesson.isFree();
+                    return CourseResponse.LessonResponse.builder()
+                            .id(lesson.getId())
+                            .title(lesson.getTitle())
+                            .description(lesson.getDescription())
+                            .type(lesson.getType() != null ? lesson.getType().name() : null)
+                            .videoUrl(lessonAccessible ? lesson.getVideoUrl() : null)
+                            .content(lessonAccessible ? lesson.getContent() : "Login and enroll to unlock this lesson.")
+                            .duration(lesson.getDuration())
+                            .orderIndex(lesson.getOrderIndex())
+                            .free(lesson.isFree())
+                            .published(lesson.isPublished())
+                            .build();
+                }).toList())
                 .rating(course.getRating())
+                .totalReviews(course.getReviews() != null ? course.getReviews().size() : 0)
+                .totalLessons(course.getLessons() != null ? course.getLessons().size() : 0)
                 .totalStudents(course.getTotalStudents())
                 .createdAt(course.getCreatedAt())
                 .updatedAt(course.getUpdatedAt())
                 .build();
+    }
+
+    private boolean hasVideoAccess(Long courseId, Long userId) {
+        if (userId == null) {
+            return false;
+        }
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return false;
+        }
+        if (user.getRole() == User.Role.ADMIN) {
+            return true;
+        }
+        if (user.getRole() == User.Role.INSTRUCTOR) {
+            // Instructors can only access videos in their own courses
+            Course course = courseRepository.findById(courseId).orElse(null);
+            return course != null && course.getInstructor().getId().equals(userId);
+        }
+        // Students can only access videos if enrolled
+        return enrollmentRepository.existsByUserIdAndCourseId(userId, courseId);
     }
 }

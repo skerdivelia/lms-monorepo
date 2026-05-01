@@ -26,6 +26,10 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/dashboard/dashboard.component').then(m => m.DashboardComponent)
   },
   {
+    path: 'admin',
+    loadComponent: () => import('./pages/admin/admin.component').then(m => m.AdminComponent)
+  },
+  {
     path: 'my-courses',
     loadComponent: () => import('./pages/my-courses/my-courses.component').then(m => m.MyCoursesComponent)
   },
@@ -44,6 +48,10 @@ export const routes: Routes = [
   {
     path: 'checkout/:courseId',
     loadComponent: () => import('./pages/checkout/checkout.component').then(m => m.CheckoutComponent)
+  },
+  {
+    path: 'learn/:id',
+    loadComponent: () => import('./pages/course-detail/course-detail.component').then(m => m.CourseDetailComponent)
   },
   {
     path: '**',

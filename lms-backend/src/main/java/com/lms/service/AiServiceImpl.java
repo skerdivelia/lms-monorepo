@@ -1,6 +1,5 @@
 package com.lms.service;
 
-import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.service.OpenAiService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;

@@ -509,10 +509,10 @@ export class CheckoutComponent implements OnInit {
   zip = '';
 
   constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private courseService: CourseService,
-    private authService: AuthService
+    private readonly route: ActivatedRoute,
+    private readonly router: Router,
+    private readonly courseService: CourseService,
+    private readonly authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -545,17 +545,18 @@ export class CheckoutComponent implements OnInit {
   }
 
   formatCardNumber(): void {
-    let value = this.cardNumber.replace(/\s/g, '');
-    value = value.replace(/(.{4})/g, '$1 ').trim();
-    this.cardNumber = value;
+    const noSpaces = this.cardNumber.replaceAll(/\s/g, '');
+    const formatted = noSpaces.replaceAll(/(.{4})/g, '$1 ').trim();
+    this.cardNumber = formatted;
   }
 
   formatExpiry(): void {
-    let value = this.expiry.replace(/\D/g, '');
-    if (value.length >= 2) {
-      value = value.substring(0, 2) + '/' + value.substring(2);
+    const digitsOnly = this.expiry.replaceAll(/\D/g, '');
+    if (digitsOnly.length >= 2) {
+      this.expiry = digitsOnly.substring(0, 2) + '/' + digitsOnly.substring(2);
+    } else {
+      this.expiry = digitsOnly;
     }
-    this.expiry = value;
   }
 
   processPayment(): void {
@@ -572,8 +573,9 @@ export class CheckoutComponent implements OnInit {
         next: (response) => {
           // In a real app, you would use Stripe.js to process the payment
           // For demo purposes, we'll simulate a successful payment
+          const paymentId = response.clientSecret || `demo-payment-${Date.now()}`;
           setTimeout(() => {
-            this.courseService.enrollInCourse(this.course!.id).subscribe({
+            this.courseService.enrollInCourse(this.course!.id, paymentId, this.finalPrice).subscribe({
               next: () => {
                 this.router.navigate(['/my-courses']);
               },

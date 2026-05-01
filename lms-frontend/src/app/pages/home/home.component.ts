@@ -1,6 +1,7 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CourseService, Course } from '../../core/services/course.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -114,15 +115,37 @@ import { CourseService, Course } from '../../core/services/course.service';
     </section>
 
     <!-- CTA Section -->
-    <section class="cta">
-      <div class="container">
-        <div class="cta-content">
-          <h2>Become an Instructor</h2>
-          <p>Share your knowledge and earn money by teaching thousands of students worldwide.</p>
-          <a routerLink="/register" class="btn btn-primary btn-lg">Start Teaching</a>
+    @if (isAdmin) {
+      <section class="cta">
+        <div class="container">
+          <div class="cta-content">
+            <h2>Admin Control Center</h2>
+            <p>Manage users, instructors, and payments from the admin dashboard.</p>
+            <a routerLink="/admin" class="btn btn-primary btn-lg">Open Admin Panel</a>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    } @else if (isInstructor) {
+      <section class="cta">
+        <div class="container">
+          <div class="cta-content">
+            <h2>Manage Your Courses</h2>
+            <p>Update course content, publish lessons, and track student engagement from your dashboard.</p>
+            <a routerLink="/instructor/courses" class="btn btn-primary btn-lg">Instructor Dashboard</a>
+          </div>
+        </div>
+      </section>
+    } @else {
+      <section class="cta">
+        <div class="container">
+          <div class="cta-content">
+            <h2>Become an Instructor</h2>
+            <p>Share your knowledge and earn money by teaching thousands of students worldwide.</p>
+            <a routerLink="/register" class="btn btn-primary btn-lg">Start Teaching</a>
+          </div>
+        </div>
+      </section>
+    }
   `,
   styles: [`
     .hero {
@@ -392,6 +415,8 @@ import { CourseService, Course } from '../../core/services/course.service';
 export class HomeComponent implements OnInit {
   featuredCourses: Course[] = [];
   loading = true;
+  isInstructor = false;
+  isAdmin = false;
 
   categories = [
     { id: 1, name: 'Programming', icon: 'fas fa-code', count: 120 },
@@ -404,9 +429,11 @@ export class HomeComponent implements OnInit {
     { id: 8, name: 'Health', icon: 'fas fa-heart', count: 35 }
   ];
 
-  constructor(private courseService: CourseService) {}
+  constructor(private readonly courseService: CourseService, private readonly authService: AuthService) {}
 
   ngOnInit(): void {
+    this.isInstructor = this.authService.isInstructor();
+    this.isAdmin = this.authService.isAdmin();
     this.loadFeaturedCourses();
   }
 

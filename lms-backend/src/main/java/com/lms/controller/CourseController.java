@@ -2,8 +2,8 @@ package com.lms.controller;
 
 import com.lms.dto.CourseRequest;
 import com.lms.dto.CourseResponse;
+import com.lms.entity.User;
 import com.lms.repository.UserRepository;
-import com.lms.security.JwtService;
 import com.lms.service.CourseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -56,8 +56,11 @@ public class CourseController {
     }
 
     @GetMapping("/{courseId}")
-    public ResponseEntity<CourseResponse> getCourse(@PathVariable Long courseId) {
-        return ResponseEntity.ok(courseService.getCourseById(courseId));
+    public ResponseEntity<CourseResponse> getCourse(
+            @PathVariable Long courseId,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        Long userId = userDetails != null ? getUserId(userDetails) : null;
+        return ResponseEntity.ok(courseService.getCourseById(courseId, userId));
     }
 
     @GetMapping
@@ -74,8 +77,10 @@ public class CourseController {
     }
 
     @GetMapping("/public/{courseId}")
-    public ResponseEntity<CourseResponse> getPublicCourse(@PathVariable Long courseId) {
-        return ResponseEntity.ok(courseService.getCourseById(courseId));
+    public ResponseEntity<CourseResponse> getPublicCourse(
+            @PathVariable Long courseId,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        return getCourse(courseId, userDetails);
     }
 
     @GetMapping("/public")
@@ -84,6 +89,14 @@ public class CourseController {
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
         return ResponseEntity.ok(courseService.getAllCourses(pageable));
+    }
+
+    @GetMapping("/instructor")
+    @PreAuthorize("hasAnyRole('INSTRUCTOR','ADMIN')")
+    public ResponseEntity<List<CourseResponse>> getCurrentInstructorCourses(
+            @AuthenticationPrincipal UserDetails userDetails) {
+        Long userId = getUserId(userDetails);
+        return ResponseEntity.ok(courseService.getCoursesByInstructor(userId));
     }
 
     @GetMapping("/instructor/{instructorId}")
@@ -145,7 +158,7 @@ public class CourseController {
 
     private Long getUserId(UserDetails userDetails) {
         return userRepository.findByEmail(userDetails.getUsername())
-                .map(user -> user.getId())
+                .map(User::getId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 }

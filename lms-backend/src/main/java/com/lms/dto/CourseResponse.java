@@ -28,10 +28,13 @@ public class CourseResponse {
     private boolean approved;
     private String requirements;
     private String outcomes;
+    private List<String> learningPoints;
     private UserSummary instructor;
     private CategoryResponse category;
     private List<LessonResponse> lessons;
     private double rating;
+    private int totalReviews;
+    private int totalLessons;
     private int totalStudents;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -45,6 +48,8 @@ public class CourseResponse {
         private String firstName;
         private String lastName;
         private String avatar;
+        private String title;
+        private String bio;
     }
 
     @Data

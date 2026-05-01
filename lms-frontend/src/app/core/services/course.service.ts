@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 export interface Course {
@@ -76,9 +77,9 @@ export interface Lesson {
   providedIn: 'root'
 })
 export class CourseService {
-  private apiUrl = `${environment.apiUrl}/courses`;
+  private readonly apiUrl = `${environment.apiUrl}/courses`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private readonly http: HttpClient) {}
 
   getCourses(page: number = 0, size: number = 10, sortBy: string = 'createdAt', sortDir: string = 'desc'): Observable<PagedResponse<Course>> {
     const params = new HttpParams()
@@ -160,11 +161,15 @@ export class CourseService {
   }
 
   checkEnrollment(courseId: number): Observable<boolean> {
-    return this.http.get<boolean>(`${environment.apiUrl}/enrollments/check/${courseId}`);
+    return this.http.get<{ enrolled: boolean }>(`${environment.apiUrl}/enrollments/check/${courseId}`)
+      .pipe(map((response) => response.enrolled));
   }
 
-  enrollInCourse(courseId: number): Observable<any> {
-    return this.http.post(`${environment.apiUrl}/enrollments`, { courseId });
+  enrollInCourse(courseId: number, paymentId: string, amount: number): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/enrollments/course/${courseId}`, {
+      paymentId,
+      amount: amount.toString()
+    });
   }
 
   // Payment methods

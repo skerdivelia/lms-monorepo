@@ -8,6 +8,9 @@
           <a routerLink="/courses" routerLinkActive="active">Courses</a>
           
           @if (authServiceGetter.isLoggedIn()) {
+            @if (authServiceGetter.isAdmin()) {
+              <a routerLink="/admin" routerLinkActive="active">Admin</a>
+            }
             @if (authServiceGetter.isInstructor()) {
               <a routerLink="/instructor/courses" routerLinkActive="active">My Courses</a>
             }
