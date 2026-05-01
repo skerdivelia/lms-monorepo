@@ -1,8 +1,8 @@
 # Ignore frontend secrets
 lms-frontend/.env
 lms-frontend/node_modules/
-lms-frontend/src/environments/environment.prod.ts
-lms-frontend/src/environments/environment.ts
+# lms-frontend/src/environments/environment.prod.ts
+# lms-frontend/src/environments/environment.ts
 
 # Ignore backend secrets
 lms-backend/.env
