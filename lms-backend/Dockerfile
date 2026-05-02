@@ -12,7 +12,7 @@ WORKDIR /app
 
 ENV JAVA_TOOL_OPTIONS "-XX:+UseSerialGC -Xmx384m"
 
-COPY --from=build /build/target/*.jar app.jar
+RUN find /build/target -name "*.jar" ! -name "*.original" | head -n 1 | xargs cp /app/app.jar
 
 EXPOSE 10000
 
