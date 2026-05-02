@@ -5,12 +5,18 @@ spring:
   application:
     name: lms-backend
   
+#  datasource:
+#    url: jdbc:postgresql://localhost:5432/lms_db
+#    username: postgres
+#    password: Skerdi199
+#    driver-class-name: org.postgresql.Driver
+
   datasource:
-    url: jdbc:postgresql://localhost:5432/lms_db
-    username: postgres
-    password: Skerdi199
+    url: jdbc:postgresql://dpg-d7qj5aq8qa3s73aru5ng-a.frankfurt-postgres.render.com/lms_yf0i
+    username: lms_yf0i_user
+    password: oXvsc8YTd8w8H4IIWNcfZKBcFItmx9WD
     driver-class-name: org.postgresql.Driver
-  
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -41,7 +47,7 @@ file:
 
 # CORS Configuration
 cors:
-  allowed-origins: http://localhost:4200
+  allowed-origins: https://quiet-frog-9057.skerdivelia.workers.dev/
 
 logging:
   level:
