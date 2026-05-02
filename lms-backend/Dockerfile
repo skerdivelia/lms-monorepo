@@ -13,8 +13,8 @@ WORKDIR /app
 # ENV JAVA_TOOL_OPTIONS "-XX:+UseSerialGC -Xmx384m"
 # ENV PORT 10000
 
-COPY --from=build /build/target/*.jar ./app.jar
+COPY --from=build /build/target/lms-backend-1.0.0.jar .
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "target/lms-backend-1.0.0.jar"]
+ENTRYPOINT ["java", "-jar", "/app/lms-backend-1.0.0.jar"]
