@@ -1,10 +1,10 @@
 FROM maven:3.9.9-eclipse-temurin-21 AS build
 WORKDIR /build
 
-COPY backend/pom.xml .
+COPY lms-backend/pom.xml .
 RUN mvn dependency:go-offline -DskipTests
 
-COPY backend/src ./src
+COPY lms-backend/src ./src
 RUN mvn clean package -DskipTests
 
 # Debug step that will show us exactly what jars exist so there is zero guesswork
