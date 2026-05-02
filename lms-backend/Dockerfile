@@ -17,4 +17,4 @@ COPY --from=build /build/target/*.jar ./app.jar
 
 EXPOSE 10000
 
-ENTRYPOINT ["java", "-cp", "./app.jar", "com.lms.LmsApplication"]
+ENTRYPOINT ["java", "-cp", "lms-backend-1.0.0"]
