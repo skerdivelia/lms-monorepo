@@ -15,6 +15,6 @@ WORKDIR /app
 
 COPY --from=build /build/target/*.jar ./app.jar
 
-EXPOSE 10000
+EXPOSE 8080
 
-ENTRYPOINT ["java", "-cp", "lms-backend-1.0.0"]
+ENTRYPOINT ["java", "-jar", "lms-backend-1.0.0.jar"]
