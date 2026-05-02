@@ -1,0 +1,283 @@
+.admin-page {
+  padding: 40px 0;
+  min-height: 100vh;
+}
+
+.page-header {
+  margin-bottom: 32px;
+}
+
+.page-header h1 {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.page-header p {
+  color: #6b7280;
+}
+
+.access-denied {
+  text-align: center;
+  padding: 80px 40px;
+  background: #fef2f2;
+  border-radius: 12px;
+  border: 2px solid #fecaca;
+}
+
+.access-denied i {
+  font-size: 64px;
+  color: #dc2626;
+  margin-bottom: 16px;
+}
+
+.access-denied h2 {
+  margin-bottom: 8px;
+}
+
+.access-denied p {
+  color: #6b7280;
+  margin-bottom: 24px;
+}
+
+.admin-tabs {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 32px;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.tab-btn {
+  padding: 12px 20px;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  color: #6b7280;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.tab-btn:hover {
+  color: #374151;
+}
+
+.tab-btn.active {
+  color: #4f46e5;
+  border-bottom-color: #4f46e5;
+}
+
+.tab-btn i {
+  margin-right: 8px;
+}
+
+.admin-section {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.admin-section h2 {
+  margin-bottom: 24px;
+  font-size: 20px;
+}
+
+.users-table,
+.payments-table {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 16px 12px;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+th {
+  background: #f9fafb;
+  font-weight: 600;
+  color: #6b7280;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+tbody tr.disabled {
+  opacity: 0.6;
+  background: #f9fafb;
+}
+
+.user-name {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.badge-student {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.badge-instructor {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.badge-admin {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-badge.active {
+  background: #d1fae5;
+  color: #059669;
+}
+
+.status-badge.blocked {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.payment-student {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.payment-student small {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.amount {
+  font-weight: 600;
+  color: #10b981;
+}
+
+code {
+  background: #f3f4f6;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-icon {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: #f3f4f6;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #6b7280;
+  transition: all 0.3s;
+}
+
+.btn-icon:hover {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.btn-icon.btn-danger:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.btn-icon.btn-success:hover {
+  background: #d1fae5;
+  color: #059669;
+}
+
+.btn-icon.btn-delete:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 48px;
+  background: #f9fafb;
+  border-radius: 12px;
+}
+
+.empty-state i {
+  font-size: 48px;
+  color: #d1d5db;
+  margin-bottom: 16px;
+}
+
+.empty-state h3 {
+  color: #374151;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  padding: 64px;
+}
+
+@media (max-width: 1024px) {
+  .users-table,
+  .payments-table {
+    overflow-x: auto;
+  }
+  table {
+    min-width: 800px;
+  }
+}
+
+@media (max-width: 576px) {
+  .admin-tabs {
+    flex-direction: column;
+    border-bottom: none;
+  }
+  .tab-btn {
+    border-bottom: 2px solid #e5e7eb;
+  }
+  .tab-btn.active {
+    border-bottom-color: #4f46e5;
+  }
+}

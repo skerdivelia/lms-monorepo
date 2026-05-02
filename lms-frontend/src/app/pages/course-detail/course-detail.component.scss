@@ -1,0 +1,326 @@
+.course-detail {
+  min-height: 100vh;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+.course-hero {
+  background: linear-gradient(135deg, #1e1b4b 0%, #4f46e5 100%);
+  color: white;
+  padding: 60px 0;
+}
+
+.breadcrumb {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.breadcrumb a {
+  color: #a5b4fc;
+  text-decoration: none;
+}
+
+.breadcrumb span {
+  color: #a5b4fc;
+}
+
+.hero-content h1 {
+  font-size: 36px;
+  margin-bottom: 16px;
+}
+
+.course-description {
+  font-size: 18px;
+  margin-bottom: 24px;
+  opacity: 0.9;
+}
+
+.course-meta {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.course-meta i {
+  color: #fbbf24;
+  margin-right: 4px;
+}
+
+.course-price {
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.original-price {
+  text-decoration: line-through;
+  opacity: 0.7;
+  font-size: 24px;
+  margin-right: 12px;
+}
+
+.discount-price {
+  color: #10b981;
+}
+
+.course-content {
+  padding: 48px 0;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 48px;
+}
+
+.section {
+  margin-bottom: 48px;
+}
+
+.section h2 {
+  font-size: 24px;
+  margin-bottom: 24px;
+}
+
+.learning-points {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  list-style: none;
+  padding: 0;
+}
+
+.learning-points li {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.learning-points i {
+  color: #10b981;
+  margin-top: 4px;
+}
+
+.curriculum {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.unlock-banner,
+.lesson-locked {
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  color: #475569;
+}
+
+.lesson-locked p {
+  margin: 0;
+  font-style: italic;
+}
+
+.lesson-item {
+  border-bottom: 1px solid #e5e7eb;
+  cursor: pointer;
+}
+
+.lesson-item:last-child {
+  border-bottom: none;
+}
+
+.lesson-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: #f9fafb;
+}
+
+.lesson-number {
+  background: #e5e7eb;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.lesson-title {
+  flex: 1;
+  font-weight: 500;
+}
+
+.lesson-duration {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.lesson-content {
+  padding: 16px;
+  background: white;
+}
+
+.video-container {
+  margin-top: 16px;
+}
+
+.video-container video,
+.video-embed iframe {
+  width: 100%;
+  border-radius: 8px;
+}
+
+.video-embed iframe {
+  min-height: 360px;
+  aspect-ratio: 16 / 9;
+  border: none;
+}
+
+.instructor-card {
+  display: flex;
+  gap: 24px;
+  padding: 24px;
+  background: #f9fafb;
+  border-radius: 12px;
+}
+
+.instructor-avatar img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.instructor-info h3 {
+  margin-bottom: 4px;
+}
+
+.instructor-title {
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+
+.reviews-summary {
+  padding: 24px;
+  background: #f9fafb;
+  border-radius: 12px;
+}
+
+.rating-overview {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.big-rating {
+  font-size: 48px;
+  font-weight: 700;
+  color: #4f46e5;
+}
+
+.stars {
+  display: flex;
+  gap: 4px;
+}
+
+.stars i {
+  color: #d1d5db;
+}
+
+.stars i.filled {
+  color: #fbbf24;
+}
+
+.enrollment-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  position: sticky;
+  top: 24px;
+}
+
+.card-image img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.card-content {
+  padding: 24px;
+}
+
+.btn-block {
+  width: 100%;
+  padding: 14px;
+  font-size: 16px;
+  margin-bottom: 24px;
+}
+
+.helper-text {
+  margin-top: 12px;
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.course-features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.course-features li {
+  display: flex;
+  gap: 12px;
+  padding: 8px 0;
+  color: #6b7280;
+}
+
+.course-features i {
+  color: #4f46e5;
+}
+
+.not-found {
+  text-align: center;
+  padding: 64px;
+}
+
+.not-found h2 {
+  margin-bottom: 24px;
+}
+
+@media (max-width: 1024px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+  .sidebar {
+    order: -1;
+  }
+  .enrollment-card {
+    position: static;
+  }
+}
+
+@media (max-width: 576px) {
+  .learning-points {
+    grid-template-columns: 1fr;
+  }
+  .course-meta {
+    flex-direction: column;
+    gap: 12px;
+  }
+}

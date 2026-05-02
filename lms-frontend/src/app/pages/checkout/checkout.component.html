@@ -1,0 +1,195 @@
+<div class="checkout-page">
+  <div class="container">
+    @if (loading) {
+      <div class="loading">
+        <div class="spinner"></div>
+      </div>
+    } @else if (course) {
+      <div class="checkout-grid">
+        <div class="checkout-form">
+          <h1>Checkout</h1>
+          <p class="subtitle">Complete your purchase</p>
+
+          @if (error) {
+            <div class="alert alert-danger">{{ error }}</div>
+          }
+
+          <div class="payment-methods">
+            <h2>Payment Method</h2>
+            <div class="method-cards">
+              <div class="method-card selected">
+                <i class="fab fa-cc-stripe"></i>
+                <span>Credit Card</span>
+              </div>
+              <div class="method-card disabled">
+                <i class="fab fa-paypal"></i>
+                <span>PayPal</span>
+              </div>
+            </div>
+          </div>
+
+          <form (ngSubmit)="processPayment()">
+            <div class="form-section">
+              <h3>Card Information</h3>
+
+              <div class="form-group">
+                <label for="cardNumber">Card Number</label>
+                <input
+                  type="text"
+                  id="cardNumber"
+                  [(ngModel)]="cardNumber"
+                  name="cardNumber"
+                  placeholder="1234 5678 9012 3456"
+                  maxlength="19"
+                  (input)="formatCardNumber()"
+                  required
+                >
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="expiry">Expiry Date</label>
+                  <input
+                    type="text"
+                    id="expiry"
+                    [(ngModel)]="expiry"
+                    name="expiry"
+                    placeholder="MM/YY"
+                    maxlength="5"
+                    (input)="formatExpiry()"
+                    required
+                  >
+                </div>
+
+                <div class="form-group">
+                  <label for="cvc">CVC</label>
+                  <input
+                    type="text"
+                    id="cvc"
+                    [(ngModel)]="cvc"
+                    name="cvc"
+                    placeholder="123"
+                    maxlength="4"
+                    required
+                  >
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="cardName">Name on Card</label>
+                <input
+                  type="text"
+                  id="cardName"
+                  [(ngModel)]="cardName"
+                  name="cardName"
+                  placeholder="John Doe"
+                  required
+                >
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h3>Billing Address</h3>
+
+              <div class="form-group">
+                <label for="address">Address</label>
+                <input
+                  type="text"
+                  id="address"
+                  [(ngModel)]="address"
+                  name="address"
+                  placeholder="123 Main St"
+                  required
+                >
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="city">City</label>
+                  <input
+                    type="text"
+                    id="city"
+                    [(ngModel)]="city"
+                    name="city"
+                    placeholder="New York"
+                    required
+                  >
+                </div>
+
+                <div class="form-group">
+                  <label for="zip">ZIP Code</label>
+                  <input
+                    type="text"
+                    id="zip"
+                    [(ngModel)]="zip"
+                    name="zip"
+                    placeholder="10001"
+                    required
+                  >
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block" [disabled]="processing">
+              @if (processing) {
+                <span class="spinner-small"></span> Processing...
+              } @else {
+                Pay \${{ finalPrice }}
+              }
+            </button>
+
+            <p class="secure-notice">
+              <i class="fas fa-lock"></i> Your payment is secure and encrypted
+            </p>
+          </form>
+        </div>
+
+        <div class="order-summary">
+          <h2>Order Summary</h2>
+
+          <div class="course-preview">
+            <img [src]="course.thumbnail || 'https://via.placeholder.com/100x60'" [alt]="course.title">
+            <div class="course-info">
+              <h3>{{ course.title }}</h3>
+              <p>{{ course.instructor?.firstName }} {{ course.instructor?.lastName }}</p>
+            </div>
+          </div>
+
+          <div class="summary-details">
+            <div class="summary-row">
+              <span>Original Price</span>
+              <span class="original">\${{ course.price }}</span>
+            </div>
+            @if (course.discountPrice && course.discountPrice < course.price) {
+              <div class="summary-row discount">
+                <span>Discount</span>
+                <span>-\${{ course.price - course.discountPrice }}</span>
+              </div>
+            }
+            <div class="summary-row total">
+              <span>Total</span>
+              <span>\${{ finalPrice }}</span>
+            </div>
+          </div>
+
+          <div class="guarantee">
+            <i class="fas fa-shield-alt"></i>
+            <div>
+              <strong>30-Day Money-Back Guarantee</strong>
+              <p>If you're not satisfied, get a full refund within 30 days.</p>
+            </div>
+          </div>
+
+          <a [routerLink]="['/courses', course.id]" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to course
+          </a>
+        </div>
+      </div>
+    } @else {
+      <div class="not-found">
+        <h2>Course not found</h2>
+        <a routerLink="/courses" class="btn btn-primary">Browse Courses</a>
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,157 @@
+<div class="admin-page">
+  <div class="container">
+    <div class="page-header">
+      <div class="header-content">
+        <h1>Admin Control Center</h1>
+        <p>Manage users, instructors, and monitor payments</p>
+      </div>
+    </div>
+
+    @if (!isAdmin) {
+      <div class="access-denied">
+        <i class="fas fa-lock"></i>
+        <h2>Access Denied</h2>
+        <p>You do not have permission to access this page.</p>
+        <a routerLink="/" class="btn btn-primary">Go Home</a>
+      </div>
+    } @else {
+      @if (loading) {
+        <div class="loading">
+          <div class="spinner"></div>
+        </div>
+      } @else {
+        <div class="admin-tabs">
+          <button
+            [class.active]="activeTab === 'users'"
+            (click)="activeTab = 'users'"
+            class="tab-btn">
+            <i class="fas fa-users"></i> Users & Instructors
+          </button>
+          <button
+            [class.active]="activeTab === 'payments'"
+            (click)="activeTab = 'payments'"
+            class="tab-btn">
+            <i class="fas fa-file-invoice-dollar"></i> Payments
+          </button>
+        </div>
+
+        <!-- Users & Instructors Tab -->
+        @if (activeTab === 'users') {
+          <section class="admin-section">
+            <h2>Users & Instructors Management</h2>
+
+            @if (users.length === 0) {
+              <div class="empty-state">
+                <i class="fas fa-users"></i>
+                <h3>No users found</h3>
+              </div>
+            } @else {
+              <div class="users-table">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Role</th>
+                      <th>Status</th>
+                      <th>Joined</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (user of users; track user.id) {
+                      <tr [class.disabled]="!user.enabled">
+                        <td>
+                          <div class="user-name">
+                            <div class="avatar">{{ getUserInitials(user) }}</div>
+                            <span>{{ user.firstName }} {{ user.lastName }}</span>
+                          </div>
+                        </td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                          <span class="badge" [ngClass]="'badge-' + user.role.toLowerCase()">
+                            {{ user.role }}
+                          </span>
+                        </td>
+                        <td>
+                          <span class="status-badge" [ngClass]="user.enabled ? 'active' : 'blocked'">
+                            {{ user.enabled ? 'Active' : 'Blocked' }}
+                          </span>
+                        </td>
+                        <td>{{ formatDate(user.createdAt) }}</td>
+                        <td>
+                          <div class="actions">
+                            @if (user.enabled) {
+                              <button class="btn-icon btn-danger" (click)="blockUser(user.id)" title="Block">
+                                <i class="fas fa-ban"></i>
+                              </button>
+                            } @else {
+                              <button class="btn-icon btn-success" (click)="unblockUser(user.id)" title="Unblock">
+                                <i class="fas fa-check"></i>
+                              </button>
+                            }
+                            <button class="btn-icon btn-delete" (click)="deleteUser(user.id)" title="Delete">
+                              <i class="fas fa-trash"></i>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+          </section>
+        }
+
+        <!-- Payments Tab -->
+        @if (activeTab === 'payments') {
+          <section class="admin-section">
+            <h2>Payment History</h2>
+
+            @if (payments.length === 0) {
+              <div class="empty-state">
+                <i class="fas fa-file-invoice-dollar"></i>
+                <h3>No payments yet</h3>
+              </div>
+            } @else {
+              <div class="payments-table">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Student</th>
+                      <th>Course</th>
+                      <th>Amount</th>
+                      <th>Status</th>
+                      <th>Payment ID</th>
+                      <th>Enrolled At</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (payment of payments; track payment.id) {
+                      <tr>
+                        <td>
+                          <div class="payment-student">
+                            <strong>{{ payment.userName }}</strong>
+                            <small>{{ payment.userEmail }}</small>
+                          </div>
+                        </td>
+                        <td>{{ payment.courseTitle }}</td>
+                        <td class="amount">\${{ payment.paidAmount.toFixed(2) }}</td>
+                        <td>
+                          <span class="status-badge active">{{ payment.status }}</span>
+                        </td>
+                        <td><code>{{ payment.paymentId }}</code></td>
+                        <td>{{ formatDate(payment.enrolledAt) }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+          </section>
+        }
+      }
+    }
+  </div>
+</div>

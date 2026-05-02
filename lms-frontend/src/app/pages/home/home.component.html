@@ -1,0 +1,138 @@
+<!-- Hero Section -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-content">
+      <h1>Learn Without Limits</h1>
+      <p>Access thousands of courses from expert instructors. Start your journey today.</p>
+      <div class="hero-buttons">
+        <a routerLink="/courses" class="btn btn-primary btn-lg">Explore Courses</a>
+        <a routerLink="/register" class="btn btn-outline btn-lg">Get Started</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stats Section -->
+<section class="stats">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-item">
+        <h3>10K+</h3>
+        <p>Students</p>
+      </div>
+      <div class="stat-item">
+        <h3>500+</h3>
+        <p>Courses</p>
+      </div>
+      <div class="stat-item">
+        <h3>100+</h3>
+        <p>Instructors</p>
+      </div>
+      <div class="stat-item">
+        <h3>4.8</h3>
+        <p>Rating</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Courses -->
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <h2>Featured Courses</h2>
+      <p>Discover our most popular courses</p>
+    </div>
+
+    @if (loading) {
+      <div class="loading">
+        <div class="spinner"></div>
+      </div>
+    } @else {
+      <div class="courses-grid">
+        @for (course of featuredCourses; track course.id) {
+          <div class="course-card">
+            <div class="course-thumbnail">
+              <img [src]="course.thumbnail || 'https://via.placeholder.com/300x200'" [alt]="course.title">
+              <span class="course-level badge badge-primary">{{ course.level }}</span>
+            </div>
+            <div class="course-content">
+              <h3>{{ course.title }}</h3>
+              <p class="course-description">{{ course.shortDescription }}</p>
+              <div class="course-meta">
+                <span><i class="fas fa-user"></i> {{ course.instructor?.firstName }} {{ course.instructor?.lastName }}</span>
+                <span><i class="fas fa-star"></i> {{ course.rating?.toFixed(1) || '0.0' }}</span>
+              </div>
+              <div class="course-price">
+                @if (course.discountPrice && course.discountPrice < course.price) {
+                  <span class="original-price">\${{ course.price }}</span>
+                  <span class="discount-price">\${{ course.discountPrice }}</span>
+                } @else {
+                  <span>\${{ course.price }}</span>
+                }
+              </div>
+              <a [routerLink]="['/courses', course.id]" class="btn btn-primary">View Course</a>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <div class="section-footer">
+      <a routerLink="/courses" class="btn btn-outline">View All Courses</a>
+    </div>
+  </div>
+</section>
+
+<!-- Categories -->
+<section class="section bg-light">
+  <div class="container">
+    <div class="section-header">
+      <h2>Browse by Category</h2>
+      <p>Find courses in your area of interest</p>
+    </div>
+
+    <div class="categories-grid">
+      @for (category of categories; track category.id) {
+        <a [routerLink]="['/courses']" [queryParams]="{category: category.id}" class="category-card">
+          <i [class]="category.icon"></i>
+          <h3>{{ category.name }}</h3>
+          <p>{{ category.count }} courses</p>
+        </a>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+@if (isAdmin) {
+  <section class="cta">
+    <div class="container">
+      <div class="cta-content">
+        <h2>Admin Control Center</h2>
+        <p>Manage users, instructors, and payments from the admin dashboard.</p>
+        <a routerLink="/admin" class="btn btn-primary btn-lg">Open Admin Panel</a>
+      </div>
+    </div>
+  </section>
+} @else if (isInstructor) {
+  <section class="cta">
+    <div class="container">
+      <div class="cta-content">
+        <h2>Manage Your Courses</h2>
+        <p>Update course content, publish lessons, and track student engagement from your dashboard.</p>
+        <a routerLink="/instructor/courses" class="btn btn-primary btn-lg">Instructor Dashboard</a>
+      </div>
+    </div>
+  </section>
+} @else {
+  <section class="cta">
+    <div class="container">
+      <div class="cta-content">
+        <h2>Become an Instructor</h2>
+        <p>Share your knowledge and earn money by teaching thousands of students worldwide.</p>
+        <a routerLink="/register" class="btn btn-primary btn-lg">Start Teaching</a>
+      </div>
+    </div>
+  </section>
+}

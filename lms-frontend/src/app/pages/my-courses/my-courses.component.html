@@ -1,0 +1,50 @@
+<div class="my-courses-page">
+  <div class="container">
+    <div class="page-header">
+      <h1>My Courses</h1>
+      <p>Continue where you left off</p>
+    </div>
+
+    @if (loading) {
+      <div class="loading">
+        <div class="spinner"></div>
+      </div>
+    } @else if (courses.length === 0) {
+      <div class="empty-state">
+        <i class="fas fa-graduation-cap"></i>
+        <h3>No courses yet</h3>
+        <p>Start learning by enrolling in a course</p>
+        <a routerLink="/courses" class="btn btn-primary">Browse Courses</a>
+      </div>
+    } @else {
+      <div class="courses-list">
+        @for (course of courses; track course.id) {
+          <div class="course-row">
+            <div class="course-thumbnail">
+              <img [src]="course.thumbnail || 'https://via.placeholder.com/200x120'" [alt]="course.title">
+            </div>
+            <div class="course-info">
+              <h3>{{ course.title }}</h3>
+              <p class="course-instructor">
+                <i class="fas fa-user"></i>
+                {{ course.instructor?.firstName }} {{ course.instructor?.lastName }}
+              </p>
+              <div class="course-progress">
+                <div class="progress-bar">
+                  <div class="progress" [style.width.%]="getProgress(course.id)"></div>
+                </div>
+                <span class="progress-text">{{ getProgress(course.id) }}% complete</span>
+              </div>
+            </div>
+            <div class="course-actions">
+              <a [routerLink]="['/learn', course.id]" class="btn btn-primary">
+                <i class="fas fa-play"></i> Continue
+              </a>
+              <a [routerLink]="['/courses', course.id]" class="btn btn-outline">View Details</a>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

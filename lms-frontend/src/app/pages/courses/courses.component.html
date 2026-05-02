@@ -1,0 +1,97 @@
+<div class="courses-page">
+  <div class="container">
+    <div class="page-header">
+      <h1>All Courses</h1>
+      <p>Explore our collection of courses</p>
+    </div>
+
+    <div class="filters">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input
+          type="text"
+          placeholder="Search courses..."
+          [(ngModel)]="searchKeyword"
+          (keyup.enter)="search()"
+        >
+      </div>
+
+      <select [(ngModel)]="selectedLevel" (change)="filterByLevel()">
+        <option value="">All Levels</option>
+        <option value="BEGINNER">Beginner</option>
+        <option value="INTERMEDIATE">Intermediate</option>
+        <option value="ADVANCED">Advanced</option>
+      </select>
+    </div>
+
+    @if (loading) {
+      <div class="loading">
+        <div class="spinner"></div>
+      </div>
+    } @else {
+      @if (courses.length === 0) {
+        <div class="empty-state">
+          <i class="fas fa-book-open"></i>
+          <h3>No courses found</h3>
+          <p>Try adjusting your search or filters</p>
+        </div>
+      } @else {
+        <div class="courses-grid">
+          @for (course of courses; track course.id) {
+            <div class="course-card">
+              <div class="course-thumbnail">
+                <img [src]="course.thumbnail || 'https://via.placeholder.com/300x200'" [alt]="course.title">
+                <span class="course-level badge badge-primary">{{ course.level }}</span>
+              </div>
+              <div class="course-content">
+                <h3>{{ course.title }}</h3>
+                <p class="course-description">{{ course.shortDescription }}</p>
+                <div class="course-meta">
+                  <span><i class="fas fa-user"></i> {{ course.instructor?.firstName }} {{ course.instructor?.lastName }}</span>
+                  <span><i class="fas fa-star"></i> {{ course.rating?.toFixed(1) || '0.0' }}</span>
+                  <span><i class="fas fa-users"></i> {{ course.totalStudents }}</span>
+                </div>
+                <div class="course-price">
+                  @if (course.discountPrice && course.discountPrice < course.price) {
+                    <span class="original-price">\${{ course.price }}</span>
+                    <span class="discount-price">\${{ course.discountPrice }}</span>
+                  } @else {
+                    <span>\${{ course.price }}</span>
+                  }
+                </div>
+                <a [routerLink]="['/courses', course.id]" class="btn btn-primary">View Course</a>
+              </div>
+            </div>
+          }
+        </div>
+
+        @if (totalPages > 1) {
+          <div class="pagination">
+            <button
+              [disabled]="currentPage === 0"
+              (click)="goToPage(currentPage - 1)"
+            >
+              <i class="fas fa-chevron-left"></i>
+            </button>
+
+            @for (page of getPageNumbers(); track page) {
+              <button
+                [class.active]="page === currentPage"
+                (click)="goToPage(page)"
+              >
+                {{ page + 1 }}
+              </button>
+            }
+
+            <button
+              [disabled]="currentPage >= totalPages - 1"
+              (click)="goToPage(currentPage + 1)"
+            >
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+        }
+      }
+    }
+  </div>
+</div>

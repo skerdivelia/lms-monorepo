@@ -1,0 +1,232 @@
+<div class="dashboard-page">
+  <div class="container">
+    <div class="dashboard-header">
+      <h1>Welcome back, {{ user?.firstName }}!</h1>
+      @if (isStudent) {
+        <p>Continue your learning journey</p>
+      } @else if (isInstructor) {
+        <p>Manage your courses and track your impact</p>
+      } @else if (isAdmin) {
+        <p>Admin control center and system overview</p>
+      }
+    </div>
+
+    @if (loading) {
+      <div class="loading">
+        <div class="spinner"></div>
+      </div>
+    } @else {
+      @if (isStudent) {
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">
+              <i class="fas fa-book-open"></i>
+            </div>
+            <div class="stat-content">
+              <span class="stat-value">{{ enrolledCourses.length }}</span>
+              <span class="stat-label">Enrolled Courses</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-content">
+              <span class="stat-value">{{ completedLessons }}</span>
+              <span class="stat-label">Completed Lessons</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-content">
+              <span class="stat-value">{{ totalHours }}</span>
+              <span class="stat-label">Learning Hours</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">
+              <i class="fas fa-certificate"></i>
+            </div>
+            <div class="stat-content">
+              <span class="stat-value">{{ certificates }}</span>
+              <span class="stat-label">Certificates</span>
+            </div>
+          </div>
+        </div>
+      } @else if (isInstructor) {
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">
+              <i class="fas fa-chalkboard-teacher"></i>
+            </div>
+            <div class="stat-content">
+              <span class="stat-value">{{ myCourses.length }}</span>
+              <span class="stat-label">Created Courses</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">
+              <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-content">
+              <span class="stat-value">{{ totalStudents }}</span>
+              <span class="stat-label">Total Students</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">
+              <i class="fas fa-star"></i>
+            </div>
+            <div class="stat-content">
+              <span class="stat-value">{{ averageRating | number:'1.1-1' }}</span>
+              <span class="stat-label">Average Rating</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">
+              <i class="fas fa-dollar-sign"></i>
+            </div>
+            <div class="stat-content">
+              <span class="stat-value">\${{ totalEarnings | number:'1.0-0' }}</span>
+              <span class="stat-label">Total Earnings</span>
+            </div>
+          </div>
+        </div>
+      }
+
+      <div class="dashboard-content">
+        @if (isStudent) {
+          <section class="section">
+            <div class="section-header">
+              <h2>Continue Learning</h2>
+              <a routerLink="/my-courses" class="view-all">View All</a>
+            </div>
+
+            @if (enrolledCourses.length === 0) {
+              <div class="empty-state">
+                <i class="fas fa-graduation-cap"></i>
+                <h3>No courses yet</h3>
+                <p>Start learning by enrolling in a course</p>
+                <a routerLink="/courses" class="btn btn-primary">Browse Courses</a>
+              </div>
+            } @else {
+              <div class="courses-grid">
+                @for (course of enrolledCourses.slice(0, 3); track course.id) {
+                  <div class="course-card">
+                    <div class="course-thumbnail">
+                      <img [src]="course.thumbnail || 'https://via.placeholder.com/300x200'" [alt]="course.title">
+                      <div class="progress-overlay">
+                        <div class="progress-bar">
+                          <div class="progress" [style.width.%]="getProgress(course)"></div>
+                        </div>
+                        <span>{{ getProgress(course) }}% complete</span>
+                      </div>
+                    </div>
+                    <div class="course-content">
+                      <h3>{{ course.title }}</h3>
+                      <p class="course-instructor">{{ course.instructor?.firstName }} {{ course.instructor?.lastName }}</p>
+                      <a [routerLink]="['/learn', course.id]" class="btn btn-primary btn-sm">Continue</a>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </section>
+        }
+
+        @if (isInstructor) {
+          <section class="section">
+            <div class="section-header">
+              <h2>My Courses</h2>
+              <a routerLink="/instructor/courses" class="view-all">Manage All</a>
+            </div>
+
+            @if (myCourses.length === 0) {
+              <div class="empty-state">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <h3>No courses yet</h3>
+                <p>Create your first course to start teaching</p>
+                <a routerLink="/instructor/course-form" class="btn btn-primary">Create Course</a>
+              </div>
+            } @else {
+              <div class="courses-grid">
+                @for (course of myCourses.slice(0, 3); track course.id) {
+                  <div class="course-card">
+                    <div class="course-thumbnail">
+                      <img [src]="course.thumbnail || 'https://via.placeholder.com/300x200'" [alt]="course.title">
+                      <div class="course-status" [class.published]="course.published" [class.draft]="!course.published">
+                        {{ course.published ? 'Published' : 'Draft' }}
+                      </div>
+                    </div>
+                    <div class="course-content">
+                      <h3>{{ course.title }}</h3>
+                      <p class="course-stats">
+                        <i class="fas fa-users"></i> {{ course.totalStudents || 0 }} students
+                        <i class="fas fa-star"></i> {{ course.rating?.toFixed(1) || '0.0' }}
+                      </p>
+                      <a [routerLink]="['/instructor/courses', course.id]" class="btn btn-outline btn-sm">Edit</a>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </section>
+        }
+
+        @if (isAdmin) {
+          <section class="section admin-section">
+            <div class="section-header">
+              <h2>Admin Control Center</h2>
+              <a routerLink="/admin" class="view-all">Open Admin</a>
+            </div>
+            <div class="admin-summary-grid">
+              <div class="admin-card">
+                <i class="fas fa-users-cog"></i>
+                <h3>Users & Instructors</h3>
+                <p>Manage active accounts, block or remove users, and monitor instructors.</p>
+              </div>
+              <div class="admin-card">
+                <i class="fas fa-file-invoice-dollar"></i>
+                <h3>Payments</h3>
+                <p>Review recent enrollments, payments, and transaction history.</p>
+              </div>
+            </div>
+          </section>
+        }
+
+        @if (isStudent) {
+          <section class="section">
+            <div class="section-header">
+              <h2>Recommended For You</h2>
+            </div>
+
+            @if (recommendedCourses.length === 0) {
+              <div class="empty-state">
+                <i class="fas fa-lightbulb"></i>
+                <h3>No recommendations yet</h3>
+                <p>Enroll in courses to get personalized recommendations</p>
+              </div>
+            } @else {
+              <div class="courses-grid">
+                @for (course of recommendedCourses.slice(0, 3); track course.id) {
+                  <div class="course-card">
+                    <div class="course-thumbnail">
+                      <img [src]="course.thumbnail || 'https://via.placeholder.com/300x200'" [alt]="course.title">
+                    </div>
+                    <div class="course-content">
+                      <h3>{{ course.title }}</h3>
+                      <p class="course-price">\${{ course.price }}</p>
+                      <a [routerLink]="['/courses', course.id]" class="btn btn-outline btn-sm">View</a>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </section>
+        }
+      </div>
+    }
+  </div>
+</div>
