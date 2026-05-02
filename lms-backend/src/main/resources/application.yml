@@ -47,7 +47,7 @@ file:
 
 # CORS Configuration
 cors:
-  allowed-origins: https://quiet-frog-9057.skerdivelia.workers.dev/
+  allowed-origins: https://restless-voice-a0cf.skerdivelia.workers.dev/
 
 logging:
   level:
